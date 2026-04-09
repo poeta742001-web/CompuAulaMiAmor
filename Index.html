@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudio Sónico | Investigación Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --muted: #292929;
+            --border: #2e2e2e;
+            --text: #ffffff;
+            --text-body: #a6a6a6;
+            --neon-pink: #ff4081;
+            --neon-blue: #00e5ff;
+            --neon-yellow: #ffea00;
+            --glow-pink: 0 0 20px rgba(255,64,129,0.4);
+            --glow-blue: 0 0 20px rgba(0,229,255,0.4);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,h2,h3,h4 { font-family: 'Montserrat', sans-serif; }
+
+        /* ---- Floating Notes ---- */
+        .music-note {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            color: rgba(255,64,129,0.12);
+            animation: float-note linear infinite;
+        }
+        @keyframes float-note {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0); opacity:0; }
+            10% { opacity:0.5; transform: translateY(80vh) rotate(20deg) scale(0.8); }
+            50% { opacity:0.3; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(0.4); opacity:0; }
+        }
+
+        /* ---- Equalizer ---- */
+        .equalizer { display:flex; align-items:flex-end; gap:3px; height:40px; justify-content:center; }
+        .eq-bar { width:6px; border-radius:3px; animation: eq-bar 1.2s ease-in-out infinite; }
+        @keyframes eq-bar {
+            0%,100% { height:15%; }
+            25% { height:80%; }
+            50% { height:40%; }
+            75% { height:95%; }
+        }
+        .eq-pink .eq-bar { background: var(--neon-pink); }
+        .eq-blue .eq-bar { background: var(--neon-blue); }
+
+        /* ---- Waveform ---- */
+        .waveform { display:flex; align-items:center; gap:2px; height:48px; justify-content:center; opacity:0.3; }
+        .wave-bar { width:3px; border-radius:3px; background:var(--neon-pink); height:100%; transform-origin:center; animation: wave 1.5s ease-in-out infinite; }
+        @keyframes wave {
+            0%,100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* ---- Glowing BG circles ---- */
+        .glow-circle {
+            position:absolute; border-radius:50%; opacity:0.06; pointer-events:none;
+        }
+        .glow-pink { background: radial-gradient(circle, var(--neon-pink), transparent 70%); width:600px; height:600px; top:-10%; right:-10%; animation: glow-rotate 20s linear infinite; }
+        .glow-blue { background: radial-gradient(circle, var(--neon-blue), transparent 70%); width:500px; height:500px; bottom:-10%; left:-10%; animation: glow-rotate 25s linear infinite reverse; }
+        @keyframes glow-rotate { from{transform:scale(1) rotate(0deg);} 50%{transform:scale(1.2) rotate(180deg);} to{transform:scale(1) rotate(360deg);} }
+
+        /* ---- Hero ---- */
+        .hero {
+            position:relative; min-height:80vh; display:flex; flex-direction:column;
+            justify-content:center; align-items:center; text-align:center; padding:40px 24px; overflow:hidden;
+        }
+        .hero-content { position:relative; z-index:10; animation: fadeInUp 1s ease-out; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(50px);} to{opacity:1;transform:translateY(0);} }
+
+        .hero-label { font-size:0.75rem; letter-spacing:0.5em; text-transform:uppercase; color:var(--neon-pink); margin-bottom:12px; animation: fadeIn 1s 0.3s both; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+        .hero h1 { font-size:clamp(2.2rem,6vw,4.5rem); font-weight:900; line-height:1.1; }
+        .gradient-text { background:linear-gradient(135deg, var(--neon-pink), var(--neon-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-subtitle { margin-top:24px; font-size:clamp(1rem,2.5vw,1.25rem); color:var(--text-body); font-weight:300; max-width:640px; animation: fadeIn 1s 0.6s both; }
+        .hero-wave { margin-top:32px; animation: fadeIn 1s 0.9s both; }
+        .hero-line { position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,64,129,0.5),transparent); }
+
+        /* ---- Container ---- */
+        .container { max-width:1100px; margin:0 auto; padding:32px 24px; position:relative; z-index:10; }
+
+        /* ---- Team Card ---- */
+        .team-card {
+            position:relative; border-radius:16px; padding:32px; margin-bottom:48px;
+            background:rgba(30,30,30,0.8); border:1px solid rgba(255,255,255,0.08);
+            overflow:hidden; animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(40px);} to{opacity:1;transform:translateY(0);} }
+        .team-card .glow-bg { position:absolute; inset:0; z-index:-1; border-radius:16px; filter:blur(30px); opacity:0.2; background:linear-gradient(135deg,var(--neon-pink),var(--neon-blue)); }
+        .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px; align-items:center; }
+        .member { text-align:center; }
+        .member-icon { width:56px; height:56px; margin:0 auto 12px; border-radius:50%; background:rgba(255,64,129,0.1); border:1px solid rgba(255,64,129,0.3); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--neon-pink); }
+        .member-label { font-size:0.75rem; color:var(--text-body); }
+        .member-name { font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:600; margin-top:4px; }
+        .group-box { text-align:center; border-left:1px solid var(--border); padding-left:24px; }
+        .group-label { font-size:0.7rem; color:var(--neon-blue); letter-spacing:0.3em; text-transform:uppercase; }
+        .group-value { font-family:'Montserrat',sans-serif; font-size:2.5rem; font-weight:900; margin-top:4px; }
+
+        /* ---- Section Card ---- */
+        .section-card {
+            border-radius:16px; padding:32px 40px; margin-bottom:40px;
+            background:rgba(30,30,30,0.8); border:1px solid rgba(255,255,255,0.08);
+            transition:border-color 0.3s, transform 0.3s;
+        }
+        .section-card:hover { border-color:rgba(0,229,255,0.3); transform:translateY(-4px); }
+        .section-header { display:flex; align-items:center; gap:16px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .section-icon { font-size:1.5rem; padding:12px; border-radius:12px; background:var(--muted); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
+        .icon-blue { color:var(--neon-blue); border-color:rgba(0,229,255,0.3)!important; }
+        .icon-yellow { color:var(--neon-yellow); border-color:rgba(255,234,0,0.3)!important; }
+        .icon-pink { color:var(--neon-pink); border-color:rgba(255,64,129,0.3)!important; }
+        .icon-white { color:#fff; background:linear-gradient(135deg,var(--neon-pink),var(--neon-blue))!important; border:none!important; }
+        .section-card h2 { font-size:clamp(1.4rem,3vw,1.8rem); font-weight:700; }
+        .section-card h3 { font-size:1.1rem; color:var(--neon-yellow); margin:20px 0 8px; font-weight:700; }
+        .body-text { color:var(--text-body); font-size:1rem; margin-bottom:12px; max-width:800px; }
+        .body-text strong { color:var(--text); font-weight:600; }
+
+        /* ---- Tema visual ---- */
+        .tema-grid { display:grid; grid-template-columns:3fr 2fr; gap:32px; align-items:center; }
+        
+        /* Modificado: Removido padding y centrado de texto para que la imagen ocupe todo */
+        .visual-block { 
+            position:relative; 
+            height:220px; 
+            background:var(--muted); 
+            border-radius:12px; 
+            overflow:hidden; /* Necesario para que la imagen respete los bordes redondeados */
+            animation: pulse-glow 2s ease-in-out infinite; 
+            border: 1px solid rgba(0,229,255,0.2);
+            display: flex; /* Asegura que la imagen se estire bien */
+        }
+        
+        /* Modificado: Estilos para la imagen del álbum */
+        .album-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ajusta la imagen sin deformarla */
+            border-radius: 12px;
+        }
+
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 15px rgba(0,229,255,0.2);} 50%{box-shadow:0 0 35px rgba(0,229,255,0.4);} }
+        .on-air { position:absolute; top:10px; right:10px; background:#d32f2f; color:#fff; font-size:0.65rem; font-weight:700; padding:3px 8px; border-radius:4px; z-index:1; }
+
+        /* ---- Objectives Grid ---- */
+        .obj-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+        .obj-card { background:var(--muted); border-radius:12px; padding:24px; border:1px solid var(--border); text-align:center; transition:border-color 0.3s, transform 0.3s; }
+        .obj-card:hover { border-color:rgba(255,234,0,0.5); transform:translateY(-4px); }
+        .obj-icon { width:48px; height:48px; margin:0 auto 12px; border-radius:10px; background:rgba(255,234,0,0.1); display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--neon-yellow); }
+        .obj-card h4 { font-weight:700; margin-bottom:8px; }
+        .obj-card p { font-size:0.85rem; color:var(--text-body); margin:0; }
+
+        /* ---- Findings list ---- */
+        .findings li { position:relative; padding-left:32px; margin-bottom:16px; color:var(--text-body); }
+        .findings li::before { content:"\266A"; position:absolute; left:0; top:2px; color:var(--neon-pink); font-size:1.1rem; }
+        .findings li strong { color:var(--text); }
+
+        /* ---- Badges ---- */
+        .badges { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+        .badge { padding:6px 16px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+        .badge-blue { background:rgba(0,229,255,0.1); color:var(--neon-blue); border:1px solid rgba(0,229,255,0.3); }
+        .badge-pink { background:rgba(255,64,129,0.1); color:var(--neon-pink); border:1px solid rgba(255,64,129,0.3); }
+
+        /* ---- Conclusion ---- */
+        .conclusion-box { border-radius:12px; padding:32px; background:var(--muted); border-left:4px solid var(--neon-pink); text-align:center; box-shadow:var(--glow-pink); }
+        .conclusion-box p { font-size:clamp(1rem,2.5vw,1.25rem); font-weight:600; font-style:italic; color:var(--text); line-height:1.7; margin:0; }
+
+        /* ---- Footer ---- */
+        footer { position:relative; z-index:10; border-top:1px solid rgba(255,255,255,0.06); padding:40px 24px; text-align:center; }
+        footer p { font-size:0.85rem; color:var(--text-body); }
+
+        /* ---- Scroll Reveal ---- */
+        .reveal { opacity:0; transform:translateY(50px); transition:opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .reveal.visible { opacity:1; transform:translateY(0); }
+
+        /* ---- Responsive ---- */
+        @media(max-width:768px) {
+            .tema-grid { grid-template-columns:1fr; }
+            .group-box { border-left:none; border-top:1px solid var(--border); padding:16px 0 0; }
+            .section-card { padding:24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="glow-circle glow-pink"></div>
+    <div class="glow-circle glow-blue"></div>
+
+    <div class="hero-content">
+        <div class="equalizer eq-pink" style="margin-bottom:24px;">
+            <div class="eq-bar" style="animation-delay:0s"></div>
+            <div class="eq-bar" style="animation-delay:0.15s"></div>
+            <div class="eq-bar" style="animation-delay:0.3s"></div>
+            <div class="eq-bar" style="animation-delay:0.45s"></div>
+            <div class="eq-bar" style="animation-delay:0.6s"></div>
+            <div class="eq-bar" style="animation-delay:0.75s"></div>
+            <div class="eq-bar" style="animation-delay:0.9s"></div>
+        </div>
+        <p class="hero-label">Estudio Sónico</p>
+        <h1><span class="gradient-text">Proyecto de</span><br>Investigación Digital</h1>
+        <p class="hero-subtitle">Análisis de Frecuencias: Cómo la Música Impacta el Aprendizaje Académico</p>
+        <div class="hero-wave waveform" id="waveform"></div>
+    </div>
+    <div class="hero-line"></div>
+</div>
+
+<div class="container">
+
+    <div class="team-card reveal">
+        <div class="glow-bg"></div>
+        <div class="team-grid">
+            <div class="member">
+                <div class="member-icon">👤</div>
+                <p class="member-label">Integrante 1</p>
+                <p class="member-name">Cuellar Quezada Karla Jeannette</p>
+            </div>
+            <div class="member">
+                <div class="member-icon">👤</div>
+                <p class="member-label">Integrante 2</p>
+                <p class="member-name">Rojas Ivanna Yoalit Abrajan</p>
+            </div>
+            <div class="member">
+                <div class="member-icon">👤</div>
+                <p class="member-label">Integrante 3</p>
+                <p class="member-name">Rodriguez Velazquez Kimberly Aislinn</p>
+            </div>
+            <div class="group-box">
+                <p class="group-label">Grupo</p>
+                <p class="group-value">BMV-2C</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card reveal">
+        <div class="section-header">
+            <div class="section-icon icon-blue">🎵</div>
+            <h2>1. Elección del Tema</h2>
+        </div>
+        <div class="tema-grid">
+            <div>
+                <p class="body-text"><strong>Tema Central:</strong> La influencia directa de estímulos auditivos (música) en los procesos cognitivos de concentración y retención de información durante el estudio.</p>
+                <p class="body-text">Este tema es de <strong>alta relevancia social y cultural</strong>. La mayoría de los estudiantes modernos (Generación Z y Alpha) utilizan plataformas como Spotify o YouTube como acompañamiento esencial en sus jornadas escolares. Comprender científicamente este fenómeno permite optimizar el rendimiento y evitar hábitos contraproducentes.</p>
+            </div>
+            <div class="visual-block">
+                <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/fa/e9/42/fae942a7-dca5-6cc0-9e49-4a4f2da6b81e/23UM1IM45777.rgb.jpg/1200x630wp-60.jpg" alt="Álbum de música y audífonos" class="album-image">
+                <span class="on-air">ON AIR</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card reveal">
+        <div class="section-header">
+            <div class="section-icon icon-yellow">🎯</div>
+            <h2>2. Objetivos del Proyecto</h2>
+        </div>
+        <h3>Objetivo General</h3>
+        <p class="body-text">Determinar la correlación existente entre la escucha de diferentes géneros musicales y la variación en los niveles de atención y desempeño académico de estudiantes.</p>
+        <h3>Objetivos Específicos</h3>
+        <div class="obj-grid">
+            <div class="obj-card">
+                <div class="obj-icon">🎶</div>
+                <h4>Catalogar</h4>
+                <p>Identificar los géneros más populares entre estudiantes (Lo-fi, Clásica, Pop).</p>
+            </div>
+            <div class="obj-card">
+                <div class="obj-icon">🧠</div>
+                <h4>Medir Impacto</h4>
+                <p>Analizar cómo afectan el enfoque según la tarea (lectura vs. matemáticas).</p>
+            </div>
+            <div class="obj-card">
+                <div class="obj-icon">⚖️</div>
+                <h4>Comparar</h4>
+                <p>Establecer ventajas (motivación) vs. desventajas (distracción cognitiva).</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card reveal">
+        <div class="section-header">
+            <div class="section-icon icon-blue">🔍</div>
+            <h2>3. Método de Investigación Digital</h2>
+        </div>
+        <p class="body-text"><strong>Técnica Utilizada:</strong> Investigación Documental Avanzada y Análisis Crítico de Contenido Digital.</p>
+        <p class="body-text"><strong>Justificación del Diseño Digital:</strong> Esta metodología permite recopilar datos de estudios neurocientíficos, encuestas globales y foros educativos alojados en la red sin limitaciones geográficas. Facilita la comparación de datos estadísticos recientes sobre el comportamiento de estudiantes en entornos digitales de aprendizaje.</p>
+    </div>
+
+    <div class="section-card reveal">
+        <div class="section-header">
+            <div class="section-icon icon-pink">📊</div>
+            <h2>4 & 5. Análisis e Interpretación de Datos</h2>
+        </div>
+        <p class="body-text">El análisis de contenido digital revela patrones claros que desmitifican la idea de que la música es siempre buena o siempre mala para estudiar.</p>
+        <h3>Hallazgos Neurocientíficos Clave:</h3>
+        <ul class="findings">
+            <li><strong>La Hipótesis de la Distracción (Cuello de Botella):</strong> Tareas complejas que requieren procesamiento lingüístico (leer, escribir ensayos) compiten por los mismos recursos cerebrales que la música con letra, provocando pérdida de retención.</li>
+            <li><strong>Música Instrumental (Lo-fi / Clásica):</strong> Ayuda a mantener un nivel óptimo de alerta cerebral sin sobrecargar la memoria de trabajo.</li>
+            <li><strong>Factor de Personalidad:</strong> Estudiantes extrovertidos suelen rendir mejor con música de fondo que los introvertidos, quienes se sobre-estimulan fácilmente.</li>
+        </ul>
+        <div class="badges">
+            <span class="badge badge-blue">Efecto Mozart (Mito parcial)</span>
+            <span class="badge badge-pink">Interferencia Cognitiva (Letra)</span>
+            <span class="badge badge-blue">Regulación Emocional</span>
+            <span class="badge badge-pink">Variables Individuales</span>
+        </div>
+    </div>
+
+    <div class="section-card reveal">
+        <div class="section-header">
+            <div class="section-icon icon-white">🏁</div>
+            <h2>7. Conclusión Final</h2>
+        </div>
+        <div class="conclusion-box">
+            <p>"La música es una herramienta de regulación cognitiva de doble filo. Su efectividad no es universal; depende del tipo de tarea, el género musical y la psicología del estudiante."</p>
+        </div>
+        <p class="body-text" style="margin-top:20px;text-align:center;">Para maximizar el aprendizaje, la investigación sugiere priorizar la música instrumental para el enfoque profundo y utilizar música energética solo para tareas mecánicas o para aumentar la motivación antes del estudio.</p>
+    </div>
+
+</div>
+
+<footer>
+    <div class="equalizer eq-blue" style="margin-bottom:16px;">
+        <div class="eq-bar" style="animation-delay:0s"></div>
+        <div class="eq-bar" style="animation-delay:0.15s"></div>
+        <div class="eq-bar" style="animation-delay:0.3s"></div>
+        <div class="eq-bar" style="animation-delay:0.45s"></div>
+        <div class="eq-bar" style="animation-delay:0.6s"></div>
+    
+</footer>
+
+<script>
+const notes = ["\u266A","\u266B","\u266C","\u2669","\uD834\uDD60"];
+for(let i=0;i<18;i++){
+    const span = document.createElement("span");
+    span.className = "music-note";
+    span.textContent = notes[i%notes.length];
+    span.style.left = Math.random()*100+"%";
+    span.style.animationDelay = Math.random()*20+"s";
+    span.style.animationDuration = (Math.random()*14+10)+"s";
+    span.style.fontSize = (Math.random()*1.2+0.8)+"rem";
+    document.body.appendChild(span);
+}
+
+const wf = document.getElementById("waveform");
+for(let i=0;i<50;i++){
+    const bar = document.createElement("div");
+    bar.className = "wave-bar";
+    bar.style.animationDelay = i*0.05+"s";
+    wf.appendChild(bar);
+}
+
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");}});
+},{threshold:0.1,rootMargin:"-60px"});
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+</script>
+
+</body>
+</html>
